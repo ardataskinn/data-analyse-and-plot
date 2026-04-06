@@ -117,6 +117,22 @@
         border: 2px dashed var(--line);
         padding: 0.55rem 0.65rem;
       }
+      .sorted-wrap {
+        margin-bottom: 0.8rem;
+        background: #fff9de;
+        border: 2px dashed var(--line);
+        padding: 0.55rem 0.65rem;
+      }
+      .sorted-title {
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+      }
+      .sorted-value {
+        margin-top: 0.2rem;
+        font-weight: bold;
+        color: #7c2d12;
+        word-break: break-word;
+      }
       .stat-label {
         color: var(--ink-soft);
         font-size: 0.9rem;
@@ -196,6 +212,10 @@
       </section>
 
       <section class="card">
+        <div class="sorted-wrap">
+          <div class="sorted-title">Sıralanmış veri seti</div>
+          <div class="sorted-value" id="sortedDataBox">—</div>
+        </div>
         <div class="stats" id="statsGrid"></div>
       </section>
 
@@ -232,6 +252,7 @@
       const analyzeBtn = document.getElementById("analyzeBtn");
       const sampleBtn = document.getElementById("sampleBtn");
       const errorBox = document.getElementById("errorBox");
+      const sortedDataBox = document.getElementById("sortedDataBox");
       const statsGrid = document.getElementById("statsGrid");
       const stemLeafBox = document.getElementById("stemLeafBox");
       const stemDigitsEl = document.getElementById("stemDigits");
@@ -506,12 +527,14 @@
         errorBox.textContent = "";
         const vals = parseInput(datasetEl.value);
         if (vals === null) {
+          sortedDataBox.textContent = "—";
           statsGrid.innerHTML = "";
           stemLeafBox.textContent = "";
           errorBox.textContent = "Lutfen sadece sayi degerleri gir. Ornek: 3,5,1,2,3";
           return;
         }
         if (!vals.length) {
+          sortedDataBox.textContent = "—";
           statsGrid.innerHTML = "";
           stemLeafBox.textContent = "";
           errorBox.textContent = "En az bir sayi girmen gerekiyor.";
@@ -519,6 +542,7 @@
         }
 
         const stats = calcStats(vals);
+        sortedDataBox.textContent = stats.sorted.map((v) => qRound(v, 6)).join(", ");
         renderStats(stats);
         drawHistogram(vals);
         const stemDigits = Number(stemDigitsEl.value) || 1;
