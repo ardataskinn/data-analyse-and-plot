@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Veri Seti Analiz Edici</title>
+    <meta name="description" content="Virgulle ayrilmis veri seti girerek ortalama, medyan, mod hesapla; histogram, stem-and-leaf plot ve boxplot ciz." />
+    <meta name="keywords" content="veri seti analiz, ortalama medyan mod, histogram, stem and leaf, boxplot, istatistik, arda taşkın, arda taşkın ceng, arda taşkın bilgisayar mühendisi" />
+    <meta name="author" content="Arda Taşkın" />
+    <meta name="creator" content="Arda Taşkın" />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Veri Seti Analiz Edici" />
+    <meta property="og:description" content="Veri setini gir, temel istatistikleri hesapla ve grafigini ciz." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Veri Seti Analiz Edici" />
+    <meta name="twitter:description" content="Ortalama, medyan, mod + histogram, stem-and-leaf, boxplot." />
+    <style>
+      :root {
+        --bg: #fff7cf;
+        --card: #fff1b8;
+        --card-2: #ffe4a3;
+        --ink: #2e1b00;
+        --ink-soft: #5c3c00;
+        --line: #a85d00;
+        --accent: #ff9f1a;
+        --accent-2: #ffc857;
+        --shadow: #d97706;
+        --ok: #14532d;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
+        color: var(--ink);
+        background:
+          repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.2) 0,
+            rgba(255, 255, 255, 0.2) 2px,
+            transparent 2px,
+            transparent 6px
+          ),
+          var(--bg);
+        padding: 1rem;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin: 0 0 1rem;
+        text-align: center;
+        color: #7c2d12;
+        letter-spacing: 0.03em;
+        text-shadow: 2px 2px 0 #ffd166, -1px -1px 0 #ffffff;
+      }
+      .card {
+        background: var(--card);
+        border: 4px solid var(--line);
+        box-shadow: 8px 8px 0 var(--shadow);
+        padding: 1rem;
+        margin-bottom: 1rem;
+      }
+      .hint {
+        margin: 0.45rem 0 0.9rem;
+        color: var(--ink-soft);
+        font-size: 0.95rem;
+      }
+      label {
+        font-weight: bold;
+      }
+      textarea {
+        width: 100%;
+        min-height: 90px;
+        resize: vertical;
+        font-family: inherit;
+        font-size: 1rem;
+        border: 3px solid var(--line);
+        background: #fffef2;
+        padding: 0.65rem;
+        margin-top: 0.4rem;
+      }
+      .btnrow {
+        display: flex;
+        gap: 0.7rem;
+        flex-wrap: wrap;
+        margin-top: 0.75rem;
+      }
+      button {
+        font-family: inherit;
+        font-weight: bold;
+        border: 3px solid var(--line);
+        background: linear-gradient(180deg, var(--accent-2), var(--accent));
+        color: #3b2200;
+        padding: 0.5rem 1rem;
+        cursor: pointer;
+        box-shadow: 3px 3px 0 #7c2d12;
+      }
+      button:active {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0 #7c2d12;
+      }
+      .err {
+        color: #b91c1c;
+        font-weight: bold;
+        margin-top: 0.65rem;
+      }
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 0.65rem;
+      }
+      .stat-box {
+        background: var(--card-2);
+        border: 2px dashed var(--line);
+        padding: 0.55rem 0.65rem;
+      }
+      .stat-label {
+        color: var(--ink-soft);
+        font-size: 0.9rem;
+      }
+      .stat-value {
+        font-weight: bold;
+        color: var(--ok);
+        font-size: 1.15rem;
+      }
+      .plot-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .plot-card {
+        background: #fff9de;
+        border: 3px solid var(--line);
+        padding: 0.7rem;
+      }
+      .plot-card h3 {
+        margin: 0 0 0.6rem;
+      }
+      canvas {
+        width: 100%;
+        max-width: 100%;
+        border: 2px solid #8b5a00;
+        background: #fffef8;
+      }
+      pre {
+        margin: 0;
+        background: #fffef8;
+        border: 2px solid #8b5a00;
+        padding: 0.7rem;
+        overflow-x: auto;
+        font-family: "Courier New", monospace;
+        line-height: 1.25;
+      }
+      .plot-tools {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+        margin-bottom: 0.55rem;
+        flex-wrap: wrap;
+      }
+      .plot-tools select {
+        font-family: inherit;
+        border: 2px solid var(--line);
+        background: #fffef2;
+        padding: 0.25rem 0.45rem;
+      }
+      footer {
+        text-align: center;
+        color: var(--ink-soft);
+        font-weight: bold;
+        margin: 1rem 0 0.5rem;
+      }
+      footer a {
+        color: #9a3412;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>★ Veri Seti Analiz Edici ★</h1>
+
+      <section class="card">
+        <label for="dataset">Veri seti (virgülle ayır):</label>
+        <textarea id="dataset" placeholder="Örn: 3,5,1,2,3">3,5,1,2,3</textarea>
+        <p class="hint">
+          Ondalıklı değer de girebilirsin. Boşluklar otomatik temizlenir.
+        </p>
+        <div class="btnrow">
+          <button type="button" id="analyzeBtn">Analiz Et</button>
+          <button type="button" id="sampleBtn">Örnek Doldur</button>
+        </div>
+        <div id="errorBox" class="err" aria-live="polite"></div>
+      </section>
+
+      <section class="card">
+        <div class="stats" id="statsGrid"></div>
+      </section>
+
+      <section class="card plot-grid">
+        <div class="plot-card">
+          <h3>Histogram</h3>
+          <canvas id="histCanvas" width="860" height="290"></canvas>
+        </div>
+        <div class="plot-card">
+          <h3>Stem-and-Leaf Plot</h3>
+          <div class="plot-tools">
+            <label for="stemDigits">Stem uzunluğu:</label>
+            <select id="stemDigits">
+              <option value="1">1 basamak</option>
+              <option value="2">2 basamak</option>
+              <option value="3">3 basamak</option>
+            </select>
+          </div>
+          <pre id="stemLeafBox"></pre>
+        </div>
+        <div class="plot-card">
+          <h3>Boxplot</h3>
+          <canvas id="boxCanvas" width="860" height="210"></canvas>
+        </div>
+      </section>
+      <footer>
+        <p>Arda Taşkın</p>
+        <p><a href="https://github.com/ardataskinn" target="_blank" rel="noopener noreferrer">github.com/ardataskinn</a></p>
+      </footer>
+    </div>
+
+    <script>
+      const datasetEl = document.getElementById("dataset");
+      const analyzeBtn = document.getElementById("analyzeBtn");
+      const sampleBtn = document.getElementById("sampleBtn");
+      const errorBox = document.getElementById("errorBox");
+      const statsGrid = document.getElementById("statsGrid");
+      const stemLeafBox = document.getElementById("stemLeafBox");
+      const stemDigitsEl = document.getElementById("stemDigits");
+      const histCanvas = document.getElementById("histCanvas");
+      const boxCanvas = document.getElementById("boxCanvas");
+
+      function qRound(x, d = 4) {
+        if (!Number.isFinite(x)) return "—";
+        return x.toLocaleString("tr-TR", {
+          minimumFractionDigits: 0,
+          maximumFractionDigits: d,
+        });
+      }
+
+      function parseInput(text) {
+        const tokens = text
+          .split(",")
+          .map((v) => v.trim())
+          .filter((v) => v.length > 0);
+        if (!tokens.length) return [];
+        const nums = tokens.map((v) => Number(v));
+        if (nums.some((v) => !Number.isFinite(v))) return null;
+        return nums;
+      }
+
+      function median(sorted) {
+        const n = sorted.length;
+        const mid = Math.floor(n / 2);
+        return n % 2 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+      }
+
+      function quartiles(sorted) {
+        const n = sorted.length;
+        const q2 = median(sorted);
+        const low = sorted.slice(0, Math.floor(n / 2));
+        const high = sorted.slice(Math.ceil(n / 2));
+        const q1 = low.length ? median(low) : sorted[0];
+        const q3 = high.length ? median(high) : sorted[n - 1];
+        return { q1, q2, q3 };
+      }
+
+      function modeList(values) {
+        const map = new Map();
+        values.forEach((v) => map.set(v, (map.get(v) || 0) + 1));
+        let maxFreq = 0;
+        map.forEach((c) => { if (c > maxFreq) maxFreq = c; });
+        const modes = [];
+        map.forEach((c, k) => { if (c === maxFreq) modes.push(k); });
+        if (maxFreq === 1) return { modes: [], frequency: 1 };
+        modes.sort((a, b) => a - b);
+        return { modes, frequency: maxFreq };
+      }
+
+      function calcStats(values) {
+        const n = values.length;
+        const sorted = [...values].sort((a, b) => a - b);
+        const sum = values.reduce((a, b) => a + b, 0);
+        const mean = sum / n;
+        const med = median(sorted);
+        const mode = modeList(values);
+        const min = sorted[0];
+        const max = sorted[n - 1];
+        const range = max - min;
+        const varPop = values.reduce((s, x) => s + (x - mean) ** 2, 0) / n;
+        const stdPop = Math.sqrt(varPop);
+        const { q1, q2, q3 } = quartiles(sorted);
+        const iqr = q3 - q1;
+        return {
+          n, sorted, sum, mean, median: med, mode, min, max, range,
+          variance: varPop, std: stdPop, q1, q2, q3, iqr
+        };
+      }
+
+      function renderStats(s) {
+        const modeTxt = s.mode.modes.length
+          ? s.mode.modes.map((x) => qRound(x, 4)).join(", ")
+          : "Yok";
+        const items = [
+          ["Gözlem Sayısı (n)", s.n],
+          ["Toplam", qRound(s.sum)],
+          ["Ortalama", qRound(s.mean)],
+          ["Medyan", qRound(s.median)],
+          ["Mod", modeTxt],
+          ["Min", qRound(s.min)],
+          ["Maks", qRound(s.max)],
+          ["Aralık", qRound(s.range)],
+          ["Varyans (pop.)", qRound(s.variance)],
+          ["Std. Sapma (pop.)", qRound(s.std)],
+          ["Q1", qRound(s.q1)],
+          ["Q3", qRound(s.q3)]
+        ];
+        statsGrid.innerHTML = items
+          .map(
+            ([k, v]) =>
+              '<div class="stat-box"><div class="stat-label">' +
+              k +
+              '</div><div class="stat-value">' +
+              v +
+              "</div></div>"
+          )
+          .join("");
+      }
+
+      function drawHistogram(values) {
+        const ctx = histCanvas.getContext("2d");
+        const w = histCanvas.width;
+        const h = histCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const min = Math.min(...values);
+        const max = Math.max(...values);
+        const n = values.length;
+        const bins = Math.max(4, Math.min(12, Math.round(Math.sqrt(n))));
+        const spread = max - min || 1;
+        const binWidth = spread / bins;
+        const freq = new Array(bins).fill(0);
+
+        values.forEach((v) => {
+          let idx = Math.floor((v - min) / binWidth);
+          if (idx >= bins) idx = bins - 1;
+          if (idx < 0) idx = 0;
+          freq[idx] += 1;
+        });
+
+        const left = 56;
+        const right = 20;
+        const top = 18;
+        const bottom = 40;
+        const pw = w - left - right;
+        const ph = h - top - bottom;
+        const maxF = Math.max(...freq, 1);
+
+        ctx.strokeStyle = "#5c3c00";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(left, top);
+        ctx.lineTo(left, h - bottom);
+        ctx.lineTo(w - right, h - bottom);
+        ctx.stroke();
+
+        for (let i = 0; i <= maxF; i++) {
+          const y = h - bottom - (i / maxF) * ph;
+          ctx.strokeStyle = "rgba(92,60,0,0.15)";
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(left, y);
+          ctx.lineTo(w - right, y);
+          ctx.stroke();
+          ctx.fillStyle = "#5c3c00";
+          ctx.font = "12px Comic Sans MS";
+          ctx.fillText(String(i), 24, y + 4);
+        }
+
+        const barGap = 4;
+        const bw = pw / bins;
+        freq.forEach((f, i) => {
+          const x = left + i * bw + barGap / 2;
+          const barW = bw - barGap;
+          const barH = (f / maxF) * ph;
+          const y = h - bottom - barH;
+          ctx.fillStyle = "#f59e0b";
+          ctx.fillRect(x, y, barW, barH);
+          ctx.strokeStyle = "#9a3412";
+          ctx.lineWidth = 1.5;
+          ctx.strokeRect(x, y, barW, barH);
+          const a = min + i * binWidth;
+          ctx.fillStyle = "#5c3c00";
+          ctx.font = "11px Comic Sans MS";
+          ctx.fillText(qRound(a, 1), x, h - 22);
+        });
+      }
+
+      function stemLeaf(values, leafDigits) {
+        const divisor = 10 ** leafDigits;
+        const rows = new Map();
+        values
+          .map((v) => Math.round(v))
+          .sort((a, b) => a - b)
+          .forEach((v) => {
+            const sign = v < 0 ? -1 : 1;
+            const absV = Math.abs(v);
+            const stemAbs = Math.floor(absV / divisor);
+            const stem = sign < 0 ? -stemAbs : stemAbs;
+            const leaf = String(absV % divisor).padStart(leafDigits, "0");
+            if (!rows.has(stem)) rows.set(stem, []);
+            rows.get(stem).push(leaf);
+          });
+        const keys = [...rows.keys()].sort((a, b) => a - b);
+        if (!keys.length) return "";
+        const lines = ["Stem | Leaf", "-----------"];
+        keys.forEach((k) => {
+          lines.push(String(k).padStart(4, " ") + " | " + rows.get(k).join(" "));
+        });
+        lines.push("");
+        lines.push("* Not: Veriler en yakin tam sayiya yuvarlanir.");
+        lines.push("* Yaprak uzunlugu: " + leafDigits + " basamak.");
+        return lines.join("\n");
+      }
+
+      function drawBoxplot(stats) {
+        const { min, max, q1, q2, q3 } = stats;
+        const ctx = boxCanvas.getContext("2d");
+        const w = boxCanvas.width;
+        const h = boxCanvas.height;
+        ctx.clearRect(0, 0, w, h);
+
+        const left = 60;
+        const right = 28;
+        const y = h / 2;
+        const trackW = w - left - right;
+        const lo = min;
+        const hi = max;
+        const span = hi - lo || 1;
+        const toX = (v) => left + ((v - lo) / span) * trackW;
+
+        ctx.strokeStyle = "#5c3c00";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(left, y);
+        ctx.lineTo(w - right, y);
+        ctx.stroke();
+
+        const xMin = toX(min);
+        const xQ1 = toX(q1);
+        const xQ2 = toX(q2);
+        const xQ3 = toX(q3);
+        const xMax = toX(max);
+
+        ctx.strokeStyle = "#7c2d12";
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(xMin, y);
+        ctx.lineTo(xQ1, y);
+        ctx.moveTo(xQ3, y);
+        ctx.lineTo(xMax, y);
+        ctx.stroke();
+
+        const boxTop = y - 36;
+        const boxH = 72;
+        ctx.fillStyle = "rgba(245, 158, 11, 0.35)";
+        ctx.strokeStyle = "#9a3412";
+        ctx.lineWidth = 2;
+        ctx.fillRect(xQ1, boxTop, Math.max(2, xQ3 - xQ1), boxH);
+        ctx.strokeRect(xQ1, boxTop, Math.max(2, xQ3 - xQ1), boxH);
+
+        ctx.beginPath();
+        ctx.moveTo(xQ2, boxTop);
+        ctx.lineTo(xQ2, boxTop + boxH);
+        ctx.stroke();
+
+        [xMin, xQ1, xQ2, xQ3, xMax].forEach((x) => {
+          ctx.beginPath();
+          ctx.moveTo(x, y - 16);
+          ctx.lineTo(x, y + 16);
+          ctx.stroke();
+        });
+
+        ctx.fillStyle = "#5c3c00";
+        ctx.font = "12px Comic Sans MS";
+        [
+          [xMin, "Min: " + qRound(min, 2)],
+          [xQ1, "Q1: " + qRound(q1, 2)],
+          [xQ2, "Medyan: " + qRound(q2, 2)],
+          [xQ3, "Q3: " + qRound(q3, 2)],
+          [xMax, "Maks: " + qRound(max, 2)]
+        ].forEach(([x, txt]) => {
+          ctx.fillText(txt, x - 24, y + 42);
+        });
+      }
+
+      function analyze() {
+        errorBox.textContent = "";
+        const vals = parseInput(datasetEl.value);
+        if (vals === null) {
+          statsGrid.innerHTML = "";
+          stemLeafBox.textContent = "";
+          errorBox.textContent = "Lutfen sadece sayi degerleri gir. Ornek: 3,5,1,2,3";
+          return;
+        }
+        if (!vals.length) {
+          statsGrid.innerHTML = "";
+          stemLeafBox.textContent = "";
+          errorBox.textContent = "En az bir sayi girmen gerekiyor.";
+          return;
+        }
+
+        const stats = calcStats(vals);
+        renderStats(stats);
+        drawHistogram(vals);
+        const stemDigits = Number(stemDigitsEl.value) || 1;
+        stemLeafBox.textContent = stemLeaf(vals, stemDigits);
+        drawBoxplot(stats);
+      }
+
+      analyzeBtn.addEventListener("click", analyze);
+      sampleBtn.addEventListener("click", () => {
+        datasetEl.value = "12,13,15,18,18,19,20,22,22,23,24,25,27,31,32,34,34,35";
+        analyze();
+      });
+      stemDigitsEl.addEventListener("change", analyze);
+
+      analyze();
+    </script>
+  </body>
+</html>
