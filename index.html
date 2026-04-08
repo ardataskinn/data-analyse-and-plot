@@ -177,7 +177,8 @@
         margin-bottom: 0.55rem;
         flex-wrap: wrap;
       }
-      .plot-tools select {
+      .plot-tools select,
+      .plot-tools input {
         font-family: inherit;
         border: 2px solid var(--line);
         background: #fffef2;
@@ -222,7 +223,13 @@
       <section class="card plot-grid">
         <div class="plot-card">
           <h3>Histogram</h3>
+          <div class="plot-tools">
+            <label for="binWidthInput">Sütun genişliği:</label>
+            <input id="binWidthInput" type="number" min="0.1" step="0.1" />
+            <span class="hint" style="margin:0;">(Otomatik için boş bırak)</span>
+          </div>
           <canvas id="histCanvas" width="860" height="290"></canvas>
+          <p class="hint" id="skewInfo" style="margin-top:0.55rem;">Dağılım: —</p>
         </div>
         <div class="plot-card">
           <h3>Stem-and-Leaf Plot</h3>
@@ -256,6 +263,8 @@
       const statsGrid = document.getElementById("statsGrid");
       const stemLeafBox = document.getElementById("stemLeafBox");
       const stemDigitsEl = document.getElementById("stemDigits");
+      const binWidthInput = document.getElementById("binWidthInput");
+      const skewInfo = document.getElementById("skewInfo");
       const histCanvas = document.getElementById("histCanvas");
       const boxCanvas = document.getElementById("boxCanvas");
 
@@ -318,11 +327,16 @@
         const range = max - min;
         const varPop = values.reduce((s, x) => s + (x - mean) ** 2, 0) / n;
         const stdPop = Math.sqrt(varPop);
+        const m3 = values.reduce((s, x) => s + (x - mean) ** 3, 0) / n;
+        const skewness = stdPop > 0 ? m3 / (stdPop ** 3) : 0;
         const { q1, q2, q3 } = quartiles(sorted);
         const iqr = q3 - q1;
+        let skewClass = "Yaklaşık dengeli";
+        if (skewness > 0.5) skewClass = "Right skewed (sağa çarpık)";
+        else if (skewness < -0.5) skewClass = "Left skewed (sola çarpık)";
         return {
           n, sorted, sum, mean, median: med, mode, min, max, range,
-          variance: varPop, std: stdPop, q1, q2, q3, iqr
+          variance: varPop, std: stdPop, q1, q2, q3, iqr, skewness, skewClass
         };
       }
 
@@ -341,6 +355,8 @@
           ["Aralık", qRound(s.range)],
           ["Varyans (pop.)", qRound(s.variance)],
           ["Std. Sapma (pop.)", qRound(s.std)],
+          ["Skewness", qRound(s.skewness, 3)],
+          ["Dağılım Yorumu", s.skewClass],
           ["Q1", qRound(s.q1)],
           ["Q3", qRound(s.q3)]
         ];
@@ -356,7 +372,7 @@
           .join("");
       }
 
-      function drawHistogram(values) {
+      function drawHistogram(values, requestedBinWidth) {
         const ctx = histCanvas.getContext("2d");
         const w = histCanvas.width;
         const h = histCanvas.height;
@@ -365,9 +381,16 @@
         const min = Math.min(...values);
         const max = Math.max(...values);
         const n = values.length;
-        const bins = Math.max(4, Math.min(12, Math.round(Math.sqrt(n))));
-        const spread = max - min || 1;
-        const binWidth = spread / bins;
+        const spread = max - min;
+        const safeSpread = spread || 1;
+        const autoBins = Math.max(4, Math.min(12, Math.round(Math.sqrt(n))));
+        const normalizedInput = Number.isFinite(requestedBinWidth) && requestedBinWidth > 0
+          ? requestedBinWidth
+          : null;
+        const bins = normalizedInput
+          ? Math.max(1, Math.min(60, Math.ceil(safeSpread / normalizedInput)))
+          : autoBins;
+        const binWidth = normalizedInput || (safeSpread / bins);
         const freq = new Array(bins).fill(0);
 
         values.forEach((v) => {
@@ -544,7 +567,9 @@
         const stats = calcStats(vals);
         sortedDataBox.textContent = stats.sorted.map((v) => qRound(v, 6)).join(", ");
         renderStats(stats);
-        drawHistogram(vals);
+        const requestedBinWidth = Number(binWidthInput.value);
+        drawHistogram(vals, requestedBinWidth);
+        skewInfo.textContent = "Dağılım: " + stats.skewClass + " | Skewness: " + qRound(stats.skewness, 3);
         const stemDigits = Number(stemDigitsEl.value) || 1;
         stemLeafBox.textContent = stemLeaf(vals, stemDigits);
         drawBoxplot(stats);
@@ -556,6 +581,7 @@
         analyze();
       });
       stemDigitsEl.addEventListener("change", analyze);
+      binWidthInput.addEventListener("input", analyze);
 
       analyze();
     </script>
