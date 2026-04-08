@@ -331,18 +331,25 @@
         const skewness = stdPop > 0 ? m3 / (stdPop ** 3) : 0;
         const { q1, q2, q3 } = quartiles(sorted);
         const iqr = q3 - q1;
+        const lowerFence = q1 - 1.5 * iqr;
+        const upperFence = q3 + 1.5 * iqr;
+        const outliers = sorted.filter((x) => x < lowerFence || x > upperFence);
         let skewClass = "Yaklaşık dengeli";
         if (skewness > 0.5) skewClass = "Right skewed (sağa çarpık)";
         else if (skewness < -0.5) skewClass = "Left skewed (sola çarpık)";
         return {
           n, sorted, sum, mean, median: med, mode, min, max, range,
-          variance: varPop, std: stdPop, q1, q2, q3, iqr, skewness, skewClass
+          variance: varPop, std: stdPop, q1, q2, q3, iqr,
+          lowerFence, upperFence, outliers, skewness, skewClass
         };
       }
 
       function renderStats(s) {
         const modeTxt = s.mode.modes.length
           ? s.mode.modes.map((x) => qRound(x, 4)).join(", ")
+          : "Yok";
+        const outlierTxt = s.outliers.length
+          ? s.outliers.map((x) => qRound(x, 4)).join(", ")
           : "Yok";
         const items = [
           ["Gözlem Sayısı (n)", s.n],
@@ -355,6 +362,11 @@
           ["Aralık", qRound(s.range)],
           ["Varyans (pop.)", qRound(s.variance)],
           ["Std. Sapma (pop.)", qRound(s.std)],
+          ["IQR (Q3 - Q1)", qRound(s.iqr, 4)],
+          ["Alt Sınır (Q1 - 1.5*IQR)", qRound(s.lowerFence, 4)],
+          ["Üst Sınır (Q3 + 1.5*IQR)", qRound(s.upperFence, 4)],
+          ["Outlier Sayısı", s.outliers.length],
+          ["Outlier Değerler", outlierTxt],
           ["Skewness", qRound(s.skewness, 3)],
           ["Dağılım Yorumu", s.skewClass],
           ["Q1", qRound(s.q1)],
