@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kavramlar - Veri Seti Analiz Edici</title>
+    <meta name="description" content="İstatistik kavramlarını basit ve samimi bir dille öğren." />
+    <style>
+      :root {
+        --bg: #fff7cf;
+        --card: #fff1b8;
+        --ink: #2e1b00;
+        --line: #a85d00;
+        --accent: #ff9f1a;
+        --shadow: #d97706;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
+        color: var(--ink);
+        background:
+          repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.2) 0,
+            rgba(255, 255, 255, 0.2) 2px,
+            transparent 2px,
+            transparent 6px
+          ),
+          var(--bg);
+        padding: 1rem;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+      }
+      .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+      }
+      h1 {
+        margin: 0;
+        color: #7c2d12;
+        text-shadow: 2px 2px 0 #ffd166, -1px -1px 0 #ffffff;
+      }
+      .back {
+        border: 3px solid var(--line);
+        background: linear-gradient(180deg, #ffc857, var(--accent));
+        color: #3b2200;
+        text-decoration: none;
+        font-weight: bold;
+        padding: 0.45rem 0.85rem;
+        box-shadow: 3px 3px 0 #7c2d12;
+      }
+      .back:active {
+        transform: translate(2px, 2px);
+        box-shadow: 1px 1px 0 #7c2d12;
+      }
+      .grid {
+        display: grid;
+        gap: 0.8rem;
+      }
+      .card {
+        background: var(--card);
+        border: 3px solid var(--line);
+        box-shadow: 6px 6px 0 var(--shadow);
+        padding: 0.85rem;
+      }
+      .card h2 {
+        margin: 0 0 0.4rem;
+        color: #7c2d12;
+        font-size: 1.2rem;
+      }
+      .card p {
+        margin: 0.2rem 0;
+        line-height: 1.4;
+      }
+      .example {
+        margin-top: 0.45rem;
+        padding: 0.5rem;
+        border: 2px dashed #8b5a00;
+        background: #fff9de;
+      }
+      footer {
+        margin-top: 1rem;
+        text-align: center;
+        color: #5c3c00;
+        font-weight: bold;
+      }
+      footer a {
+        color: #9a3412;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <div class="top">
+        <h1>İstatistik Kavramları - Basit Anlatım</h1>
+        <a class="back" href="./index.html">Ana Sayfaya Dön</a>
+      </div>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Mean Value (Ortalama) nedir?</h2>
+          <p>Ortalama, sayıların "genel seviyesi" gibidir.</p>
+          <p>Bütün değerleri toplar, kaç tane değer varsa ona böleriz.</p>
+          <div class="example">
+            Örnek veri: 10, 20, 30, 40<br />
+            Toplam = 100, veri sayısı = 4<br />
+            Ortalama = 100 / 4 = <strong>25</strong>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Medyan nedir?</h2>
+          <p>Sıralanmış verinin tam ortasındaki değerdir.</p>
+          <p>Üç değer varsa ortadaki; çift sayıda değer varsa ortadaki iki değerin ortalamasıdır.</p>
+          <div class="example">
+            3, 7, 9, 20 için medyan = (7 + 9) / 2 = <strong>8</strong>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Mod nedir?</h2>
+          <p>En çok tekrar eden değerdir.</p>
+          <div class="example">
+            2, 2, 5, 7, 7, 7 için mod = <strong>7</strong>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Aralık (Range) nedir?</h2>
+          <p>En büyük değer ile en küçük değer arasındaki farktır.</p>
+          <div class="example">
+            4, 9, 15 için aralık = 15 - 4 = <strong>11</strong>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Varyans ve Standart Sapma ne anlatır?</h2>
+          <p>Veriler ortalamadan ne kadar uzaklaşıyor, bunu gösterir.</p>
+          <p>Değerler birbirine yakın ise küçük; çok dağınıksa büyük çıkar.</p>
+          <div class="example">
+            24, 25, 26 (birbirine yakın) -> düşük sapma<br />
+            5, 25, 60 (çok dağınık) -> yüksek sapma
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Q1, Q3 ve IQR nedir?</h2>
+          <p>Q1 alt çeyrek, Q3 üst çeyrek bilgisidir.</p>
+          <p>IQR = Q3 - Q1, yani verinin orta bölümünün genişliği.</p>
+          <div class="example">
+            IQR büyükse orta kısım daha yayvan, küçükse daha toplu diyebiliriz.
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Outlier (Aykırı Değer) nedir?</h2>
+          <p>Diğerlerinden çok uzak kalan "sıra dışı" değerdir.</p>
+          <div class="example">
+            10, 11, 12, 13, 90 içinde 90 genelde aykırı görülür.
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Skewness (Çarpıklık) nedir?</h2>
+          <p>Dağılım kuyruğunun sağa mı sola mı uzadığını söyler.</p>
+          <p>Sağa çarpık: büyük değerler kuyruk yapar. Sola çarpık: küçük değerler kuyruk yapar.</p>
+        </section>
+
+        <section class="card">
+          <h2>Histogram nedir?</h2>
+          <p>Veriyi sütunlara bölüp hangi aralıkta kaç değer olduğunu gösterir.</p>
+          <p>Bir bakışta "veri nerede toplanmış" sorusunun cevabını verir.</p>
+        </section>
+
+        <section class="card">
+          <h2>Stem-and-Leaf Plot nedir?</h2>
+          <p>Hem sayıları korur hem de dağılımı gösterir.</p>
+          <p>Kök (stem) ve yaprak (leaf) şeklinde ayırarak okunur.</p>
+          <div class="example">
+            12, 14, 19 -> 1 | 2 4 9
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Boxplot nedir?</h2>
+          <p>Min, Q1, medyan, Q3 ve max değerleri tek çizimde verir.</p>
+          <p>Verinin ortasını, yayılımını ve olası aykırı noktalarını hızlıca görmeyi sağlar.</p>
+        </section>
+      </div>
+
+      <footer>
+        <p>Kafa karışan yer olursa en güzel öğrenme yolu: küçük bir örnek seçip tek tek hesaplamak.</p>
+        <p>Arda Taşkın</p>
+        <p><a href="https://github.com/ardataskinn" target="_blank" rel="noopener noreferrer">github.com/ardataskinn</a></p>
+      </footer>
+    </div>
+  </body>
+</html>

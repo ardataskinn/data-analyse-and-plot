@@ -45,6 +45,32 @@
           var(--bg);
         padding: 1rem;
       }
+      .help-btn {
+        position: fixed;
+        top: 14px;
+        right: 14px;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 3px solid var(--line);
+        background: radial-gradient(circle at 30% 30%, #fff6c9, var(--accent));
+        color: #3b2200;
+        font-size: 1.4rem;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        box-shadow: 4px 4px 0 #7c2d12;
+        z-index: 20;
+      }
+      .help-btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0 #7c2d12;
+      }
+      .help-btn:hover {
+        filter: brightness(1.06);
+      }
       .wrap {
         max-width: 980px;
         margin: 0 auto;
@@ -196,6 +222,7 @@
     </style>
   </head>
   <body>
+    <a class="help-btn" href="./kavramlar.html" title="Kavramlari acikla" aria-label="Kavramlar sayfasini ac">?</a>
     <div class="wrap">
       <h1>★ Veri Seti Analiz Edici ★</h1>
 
