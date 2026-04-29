@@ -168,6 +168,43 @@
         color: var(--ok);
         font-size: 1.15rem;
       }
+      .freq-wrap {
+        margin-top: 0.8rem;
+        background: #fff9de;
+        border: 2px dashed var(--line);
+        padding: 0.55rem 0.65rem;
+      }
+      .freq-title {
+        color: var(--ink-soft);
+        font-size: 0.95rem;
+        font-weight: bold;
+        margin-bottom: 0.45rem;
+      }
+      .freq-list {
+        border: 2px solid #8b5a00;
+        background: #fffef8;
+        max-height: 220px;
+        overflow-y: auto;
+      }
+      .freq-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.6rem;
+        padding: 0.4rem 0.55rem;
+        border-bottom: 1px dashed #c99a3d;
+      }
+      .freq-row:last-child {
+        border-bottom: none;
+      }
+      .freq-value {
+        color: #7c2d12;
+        font-weight: bold;
+        word-break: break-word;
+      }
+      .freq-count {
+        color: var(--ok);
+        font-weight: bold;
+      }
       .plot-grid {
         display: grid;
         grid-template-columns: 1fr;
@@ -245,6 +282,10 @@
           <div class="sorted-value" id="sortedDataBox">—</div>
         </div>
         <div class="stats" id="statsGrid"></div>
+        <div class="freq-wrap">
+          <div class="freq-title">Veri Setindeki Değerlerin Sayısı (Frekans)</div>
+          <div class="freq-list" id="valueCountsBox"></div>
+        </div>
       </section>
 
       <section class="card plot-grid">
@@ -292,6 +333,7 @@
       const stemDigitsEl = document.getElementById("stemDigits");
       const binWidthInput = document.getElementById("binWidthInput");
       const skewInfo = document.getElementById("skewInfo");
+      const valueCountsBox = document.getElementById("valueCountsBox");
       const histCanvas = document.getElementById("histCanvas");
       const boxCanvas = document.getElementById("boxCanvas");
 
@@ -407,6 +449,22 @@
               '</div><div class="stat-value">' +
               v +
               "</div></div>"
+          )
+          .join("");
+      }
+
+      function renderValueCounts(values) {
+        const freq = new Map();
+        values.forEach((v) => freq.set(v, (freq.get(v) || 0) + 1));
+        const rows = [...freq.entries()].sort((a, b) => a[0] - b[0]);
+        valueCountsBox.innerHTML = rows
+          .map(
+            ([value, count]) =>
+              '<div class="freq-row"><div class="freq-value">' +
+              qRound(value, 6) +
+              '</div><div class="freq-count">' +
+              count +
+              " adet</div></div>"
           )
           .join("");
       }
@@ -592,6 +650,7 @@
           sortedDataBox.textContent = "—";
           statsGrid.innerHTML = "";
           stemLeafBox.textContent = "";
+          valueCountsBox.innerHTML = "";
           errorBox.textContent = "Lutfen sadece sayi degerleri gir. Ornek: 3,5,1,2,3";
           return;
         }
@@ -599,6 +658,7 @@
           sortedDataBox.textContent = "—";
           statsGrid.innerHTML = "";
           stemLeafBox.textContent = "";
+          valueCountsBox.innerHTML = "";
           errorBox.textContent = "En az bir sayi girmen gerekiyor.";
           return;
         }
@@ -606,6 +666,7 @@
         const stats = calcStats(vals);
         sortedDataBox.textContent = stats.sorted.map((v) => qRound(v, 6)).join(", ");
         renderStats(stats);
+        renderValueCounts(stats.sorted);
         const requestedBinWidth = Number(binWidthInput.value);
         drawHistogram(vals, requestedBinWidth);
         skewInfo.textContent = "Dağılım: " + stats.skewClass + " | Skewness: " + qRound(stats.skewness, 3);
